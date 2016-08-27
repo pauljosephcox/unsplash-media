@@ -325,6 +325,16 @@ class Unsplash_Media {
 
 $unsplash_media = new Unsplash_Media();
 
+// function custom_media_upload_tab_name( $tabs ) {
+//     $newtab = array( 'tab_slug' => 'Your Tab Name' );
+//     return array_merge( $tabs, $newtab );
+// }
 
+// add_filter( 'media_upload_tabs', 'custom_media_upload_tab_name' );
+
+// function custom_media_upload_tab_content() {
+//     // Add you content here.
+// }
+// add_action( 'media_upload_tab_slug', 'custom_media_upload_tab_content' );
 
 
