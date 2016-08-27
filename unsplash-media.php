@@ -82,7 +82,8 @@ class Unsplash_Media {
 		$url = $this->api . $path;
 
 		$url .= "?query=".$vars['query'];
-		$url .= '&per_page='.$vars['per_page'];
+		if(!empty($vars['per_page'])) $url .= '&per_page='.$vars['per_page'];
+		if(!empty($vars['page'])) $url .= '&page='.$vars['page'];
 
 
 		$response = wp_remote_get($url, $args);
@@ -99,26 +100,6 @@ class Unsplash_Media {
 
 	}
 
-
-
-
-   /**
-    * Install
-    * ---------------------------------------------
-    * @return false
-    * ---------------------------------------------
-    **/
-
-	public static function install() { }
-
-   /**
-    * Setup
-    * ---------------------------------------------
-    * @return false
-    * ---------------------------------------------
-    **/
-
-	public function setup() {}
 
 
    /**
