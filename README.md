@@ -1,2 +1,2 @@
-# wordpress-plugin-starter
-An object oriented, opinionated plugin boilerplate for WordPress
+# Unsplash Media
+Integration for the Wordpress Media Library to search Unsplash and import photos.
