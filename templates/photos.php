@@ -4,7 +4,7 @@
  *
  */
  ?>
-<div class="wrap">
+<div class="wrap unsplash-media-library">
 
     <h2><?php _e('Unsplash Media'); ?></h2>
     <p class="lead">Free stock photos for use in your website. Select photos below to import them to your media library.</p>

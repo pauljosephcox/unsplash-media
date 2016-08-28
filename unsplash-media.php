@@ -44,9 +44,7 @@ class Unsplash_Media {
 
 
 		// Actions
-		// add_action('init', array($this, 'setup'), 10, 0);
-		// add_action('wp_enqueue_scripts', array($this, 'scripts'));
-		// add_action('wp_loaded', array($this , 'forms'));
+		add_action('admin_enqueue_scripts', array($this, 'scripts'));
 		add_action('parse_request', array($this , 'custom_url_paths'));
 		add_action('admin_menu', array($this, 'register_options_page'));
 
@@ -110,7 +108,7 @@ class Unsplash_Media {
 
 	public function scripts() {
 
-		// wp_enqueue_script('jquery.validate', '//cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.11.1/jquery.validate.min.js', array('jquery'), $this->version, true);
+		wp_enqueue_script('unsplash', $this->dir . '/assets/unsplash.js', array('jquery'), $this->version, true);
 
 	}
 
