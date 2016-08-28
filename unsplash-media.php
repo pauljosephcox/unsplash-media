@@ -131,103 +131,11 @@ class Unsplash_Media {
 				$this->output_json(array('success'=>'imported'));
 			}
 
-			// $attachment = array(
-			// 	'guid'           => $wp_upload_dir['url'] . '/' . basename( $filename ),
-			// 	'post_mime_type' => 'jpg',
-			// 	'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $filename ) ),
-			// 	'post_content'   => $vars['credit'],
-			// 	'post_status'    => 'inherit'
-			// );
-			// // trace($attachment);
-			// $attach_id = wp_insert_attachment( $attachment, $wp_upload_dir['url'] . '/' . basename( $filename ), 1 );
-			// // trace($attach_id);
-			// // Generate the metadata for the attachment, and update the database record.
-			// $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
-			// // trace($attach_data);
-			// wp_update_attachment_metadata( $attach_id, $attach_data );
-
-			// $this->output_json(array('success'=>'imported'));
-
-			// trace($new_path,"URL");
-			// $image = media_sideload_image($new_path, 1, $vars['credit']);
-			// trace($image);
-			// die;
-
-			// $image = $this->sideload($vars['photo'],1,$vars['credit']);
-			// trace($image);
-
-
-
-
-			// $vars['photo'] = str_replace('https', 'http', $vars['photo']);
-			// $tmp = download_url( $url );
-			// trace($tmp,"Download URL");
-			// $contents = $this->mask('/api/unplash/mask?photo='.$vars['photo']);
-			// die;
-
-			// $t = fopen($vars['photo'], "r");
-			// trace($t);
-
-			// $this->mask($vars['photo']);
-			// $r = wp_remote_get($vars['photo'],array('timeout'=>10000));
-			// trace($r);
-
-			// $image = media_sideload_image($vars['photo'], 1, $vars['credit']);
-			// trace($image);
 		}
 
 
 		die;
 	}
-
-	// public function sideload($file, $post_id, $desc){
-
-	// 	if ( ! empty( $file ) ) {
-
-	//         $file_array = array();
-	//         $file_array['name'] = basename( $file );
-
-	//         // Download file to temp location.
-	//         $file_array['tmp_name'] = download_url( $file );
-
-	//         // If error storing temporarily, return the error.
-	//         if ( is_wp_error( $file_array['tmp_name'] ) ) {
-	//             return $file_array['tmp_name'];
-	//         }
-
-	//         // Do the validation and storage stuff.
-	//         $id = media_handle_sideload( $file_array, $post_id, $desc );
-
-	//         // If error storing permanently, unlink.
-	//         if ( is_wp_error( $id ) ) {
-	//             @unlink( $file_array['tmp_name'] );
-	//             return $id;
-	//         }
-
-	//         $src = wp_get_attachment_url( $id );
-	//     }
-
-	//     // Finally, check to make sure the file has been saved, then return the HTML.
-	//     if ( ! empty( $src ) ) {
-	//         if ( $return === 'src' ) {
-	//             return $src;
-	//         }
-
-	//         $alt = isset( $desc ) ? esc_attr( $desc ) : '';
-	//         $html = "<img src='$src' alt='$alt' />";
-	//         return $html;
-	//     } else {
-	//         return new WP_Error( 'image_sideload_failed' );
-	//     }
-
-	// }
-
-	// public function mask(){
-	// 	header('Content-type: image/jpg');
-	// 	$r = wp_remote_get($vars['photo'],array('timeout'=>10000));
-	// 	trace($r);
-	// }
-
 
 
 
