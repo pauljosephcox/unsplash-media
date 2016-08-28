@@ -18,16 +18,7 @@
 
 				<div class="meta-box">
 
-					<h1>Display Unsplash Feed Here</h1>
-					<h1>Add Search Bar</h1>
-					<h1>Load More button</h1>
-					<h1>Import button</h1>
 
-					<hr>
-
-					<p>TODO: Start by loading in the most recent feed from unsplash</p>
-					<p>TODO: Add search bar</p>
-					<p>TODO: Query Search Params and handles load more</p>
 
 					<hr>
 
@@ -37,9 +28,18 @@
 
 							<div class="media-toolbar-primary search-form">
 
-								<label for="media-search-input" class="screen-reader-text">Search Media</label>
+								<form class="unsplash-search" action="/">
 
-								<input type="search" placeholder="Search" id="media-search-input" class="search">
+									<label for="media-search-input" class="screen-reader-text">Search Media</label>
+
+									<input name="search" type="search" placeholder="Search stock photos..." id="media-search-input" class="unsplash-search-text">
+
+									<input name="submit" type="submit" class="button button-primary button-large search-button" id="unsplash-search-button" value="Search Photos">
+
+									<?php wp_nonce_field( 'unsplash_media' ); ?>
+
+								</form>
+
 							</div>
 
 						</div>
@@ -48,25 +48,11 @@
 
 					<div class="content">
 
-						<h3>Loading...</h3>
+						<h3 class="unplash-message">Loading...</h3>
 
-						<ul tabindex="-1" class="attachments ui-sortable ui-sortable-disabled" id="__attachments-view-42">
-
-							<li tabindex="0" role="checkbox" aria-label="WebHeader2-copy-1347x900" aria-checked="false" data-id="736" class="attachment save-ready">
+						<ul tabindex="-1" class="unsplash-photos">
 
 
-								<div class="attachment-preview js--select-attachment type-image subtype-jpeg landscape">
-									<div class="thumbnail">
-
-											<div class="centered">
-												<img src="http://thechurchco.com/wp-content/uploads/2015/12/WebHeader2-copy-1347x900-300x200.jpg" draggable="false" alt="">
-											</div>
-
-									</div>
-
-								</div>
-
-							</li>
 
 						</ul>
 

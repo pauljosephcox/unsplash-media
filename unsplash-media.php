@@ -57,7 +57,7 @@ class Unsplash_Media {
 
 
    /**
-    * Search
+    * GET
     * -------------------------------------
     * @param $vars $_GET vars
     * @param query	Search terms.
@@ -71,31 +71,163 @@ class Unsplash_Media {
 
 	public function get($path, $vars){
 
+		// Set Headers
+
 		$args = array();
-		// $args['headers'] = array( 'Authorization' => 'Client-ID ' . get_option('unsplash_media_application_id'));
 		$args['headers'] = array( 'Authorization' => 'Client-ID ' . $this->application_id);
 
+		// Set API Path
 
 		$url = $this->api . $path;
 
-		$url .= "?query=".$vars['query'];
-		if(!empty($vars['per_page'])) $url .= '&per_page='.$vars['per_page'];
-		if(!empty($vars['page'])) $url .= '&page='.$vars['page'];
+		// Build Querystring
 
+		$qs = array();
+		foreach($vars as $key=>$value) $qs[] = $key.'='.$value;
+
+		if(!empty($qs)) $querystring = implode('&', $qs);
+		if(!empty($querystring)) $url .= '?' .$querystring;
+
+		// Make Request
 
 		$response = wp_remote_get($url, $args);
-		$photos = json_decode($response['body']);
-
-
-		foreach($photos as $photo){
-
-			// echo "<img src=\"". $photo->urls->thumb."\"><br>";
-			echo "<img src=\"{$photo->urls->thumb}\">";
-
-		}
+		header('Content-type: application/json');
+		echo $response['body'];
 		die;
 
+
 	}
+
+   /**
+    * Import Photo
+    * ---------------------------------------------
+    * @return null
+    * ---------------------------------------------
+    **/
+
+	public function import($vars){
+
+		if(!wp_verify_nonce( $vars['_wpnonce'], 'unsplash_media')) $this->output_json(array('error'=>'invalid nonce'));
+
+		if(!empty($vars['photo'])){
+
+			require_once(ABSPATH . 'wp-admin/includes/media.php');
+			require_once(ABSPATH . 'wp-admin/includes/file.php');
+			require_once(ABSPATH . 'wp-admin/includes/image.php');
+
+			$filename = basename($vars['photo']).'.jpg';
+
+
+			// Save As
+			$local_path = download_url($vars['photo']);
+			$data = file_get_contents($local_path);
+
+			$wp_upload_dir = wp_upload_dir();
+
+			file_put_contents($wp_upload_dir['path'].'/'.$filename, $data); // This works...
+
+			$image = media_sideload_image($wp_upload_dir['url'] . '/' . basename( $filename ),1,$vars['credit']);
+			if($image){
+				$this->output_json(array('success'=>'imported'));
+			}
+
+			// $attachment = array(
+			// 	'guid'           => $wp_upload_dir['url'] . '/' . basename( $filename ),
+			// 	'post_mime_type' => 'jpg',
+			// 	'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $filename ) ),
+			// 	'post_content'   => $vars['credit'],
+			// 	'post_status'    => 'inherit'
+			// );
+			// // trace($attachment);
+			// $attach_id = wp_insert_attachment( $attachment, $wp_upload_dir['url'] . '/' . basename( $filename ), 1 );
+			// // trace($attach_id);
+			// // Generate the metadata for the attachment, and update the database record.
+			// $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
+			// // trace($attach_data);
+			// wp_update_attachment_metadata( $attach_id, $attach_data );
+
+			// $this->output_json(array('success'=>'imported'));
+
+			// trace($new_path,"URL");
+			// $image = media_sideload_image($new_path, 1, $vars['credit']);
+			// trace($image);
+			// die;
+
+			// $image = $this->sideload($vars['photo'],1,$vars['credit']);
+			// trace($image);
+
+
+
+
+			// $vars['photo'] = str_replace('https', 'http', $vars['photo']);
+			// $tmp = download_url( $url );
+			// trace($tmp,"Download URL");
+			// $contents = $this->mask('/api/unplash/mask?photo='.$vars['photo']);
+			// die;
+
+			// $t = fopen($vars['photo'], "r");
+			// trace($t);
+
+			// $this->mask($vars['photo']);
+			// $r = wp_remote_get($vars['photo'],array('timeout'=>10000));
+			// trace($r);
+
+			// $image = media_sideload_image($vars['photo'], 1, $vars['credit']);
+			// trace($image);
+		}
+
+
+		die;
+	}
+
+	// public function sideload($file, $post_id, $desc){
+
+	// 	if ( ! empty( $file ) ) {
+
+	//         $file_array = array();
+	//         $file_array['name'] = basename( $file );
+
+	//         // Download file to temp location.
+	//         $file_array['tmp_name'] = download_url( $file );
+
+	//         // If error storing temporarily, return the error.
+	//         if ( is_wp_error( $file_array['tmp_name'] ) ) {
+	//             return $file_array['tmp_name'];
+	//         }
+
+	//         // Do the validation and storage stuff.
+	//         $id = media_handle_sideload( $file_array, $post_id, $desc );
+
+	//         // If error storing permanently, unlink.
+	//         if ( is_wp_error( $id ) ) {
+	//             @unlink( $file_array['tmp_name'] );
+	//             return $id;
+	//         }
+
+	//         $src = wp_get_attachment_url( $id );
+	//     }
+
+	//     // Finally, check to make sure the file has been saved, then return the HTML.
+	//     if ( ! empty( $src ) ) {
+	//         if ( $return === 'src' ) {
+	//             return $src;
+	//         }
+
+	//         $alt = isset( $desc ) ? esc_attr( $desc ) : '';
+	//         $html = "<img src='$src' alt='$alt' />";
+	//         return $html;
+	//     } else {
+	//         return new WP_Error( 'image_sideload_failed' );
+	//     }
+
+	// }
+
+	// public function mask(){
+	// 	header('Content-type: image/jpg');
+	// 	$r = wp_remote_get($vars['photo'],array('timeout'=>10000));
+	// 	trace($r);
+	// }
+
 
 
 
@@ -126,13 +258,47 @@ class Unsplash_Media {
 
 		switch ($pagename) {
 
-			case 'api/unsplash/search':
+			case 'api/unsplash/photos/search':
 				$this->get('/photos/search',$_GET);
 				break;
+
+			case 'api/unsplash/import':
+				$this->import($_POST);
+				break;
+
+			// case 'api/unsplash/mask.jpg':
+			// 	$this->mask($_POST);
+			// 	break;
+
 
 			default:
 				break;
 
+		}
+
+	}
+
+   /**
+    * Forms
+    * ---------------------------------------------
+    * @return false
+    * ---------------------------------------------
+    **/
+
+	public function forms() {
+
+		if (!isset($_POST['unsplash_media_actions'])) return;
+
+		if(!wp_verify_nonce( $_POST['_wpnonce'], 'unsplash_media')){ $this->redirect($_POST['_wp_http_referer']); }
+
+		switch ($_POST['unsplash_media_actions']) {
+
+			case 'import':
+				$this->import($_POST);
+				break;
+
+			default:
+				break;
 		}
 
 	}
