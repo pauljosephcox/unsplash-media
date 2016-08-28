@@ -40,6 +40,8 @@ class Unsplash_Media {
 		$this->notice = false;
 
 		$this->api = 'https://api.unsplash.com';
+		$this->application_id = '7fa28f8e758490ca08252023b476bf194658a5cd27c09ebe15af61b7e4db6548';
+
 
 		// Actions
 		// add_action('init', array($this, 'setup'), 10, 0);
@@ -55,14 +57,10 @@ class Unsplash_Media {
 
 	}
 
-	// ------------------------------------
-	// Search Photo
-	// ------------------------------------
 
    /**
     * Search
     * -------------------------------------
-    *
     * @param $vars $_GET vars
     * @param query	Search terms.
     * @param category	Category ID(‘s) to filter search. If multiple, comma-separated. (deprecated)
@@ -70,14 +68,15 @@ class Unsplash_Media {
     * @param page	Page number to retrieve. (Optional; default: 1)
     * @param per_page	Number of items per page. (Optional; default: 10)
     * @return JSON
-    *
     * -------------------------------------
     **/
 
 	public function get($path, $vars){
 
 		$args = array();
-		$args['headers'] = array( 'Authorization' => 'Client-ID ' . get_option('unsplash_media_application_id'));
+		// $args['headers'] = array( 'Authorization' => 'Client-ID ' . get_option('unsplash_media_application_id'));
+		$args['headers'] = array( 'Authorization' => 'Client-ID ' . $this->application_id);
+
 
 		$url = $this->api . $path;
 
@@ -149,39 +148,7 @@ class Unsplash_Media {
 
 	public function register_options_page() {
 
-		// main page
-		add_options_page('Unsplash Media', 'Unsplash Media', 'manage_options', 'unsplash_media_options', array($this, 'include_options'));
-		add_action('admin_init', array($this, 'plugin_options'));
-
-	}
-
-
-   /**
-    * Include Options Page
-    * ---------------------------------------------
-    * @return false
-    * ---------------------------------------------
-    **/
-
-	public function include_options() { require('templates/options.php'); }
-
-
-   /**
-    * Plugin Options
-    * ---------------------------------------------
-    * @return false
-    * ---------------------------------------------
-    **/
-
-	public function plugin_options() {
-
-		$options = array(
-			'unsplash_media_application_id'
-		);
-
-		foreach ($options as $option) {
-			register_setting('unsplash_media_options', $option);
-		}
+		add_media_page('Unplash Media', 'Unsplash Media', 'manage_options', 'unsplash_media_options', function(){ $this->template_include('photos.php'); });
 
 	}
 
