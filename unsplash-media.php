@@ -13,9 +13,6 @@
 
 if (!defined('ABSPATH')) { exit; }
 
-/*==========  Activation Hook  ==========*/
-register_activation_hook( __FILE__, array( 'Unsplash_Media', 'install' ) );
-
 
 /**
  * Main Unsplash_Media Class
@@ -25,8 +22,6 @@ register_activation_hook( __FILE__, array( 'Unsplash_Media', 'install' ) );
  */
 class Unsplash_Media {
 
-	public $errors = false;
-	public $notices = false;
 	public $slug = 'unsplash-media';
 
 	function __construct() {
@@ -34,10 +29,8 @@ class Unsplash_Media {
 		$this->path = plugin_dir_path(__FILE__);
 		$this->folder = basename($this->path);
 		$this->dir = plugin_dir_url(__FILE__);
-		$this->version = '1.0';
-
-		$this->errors = false;
-		$this->notice = false;
+		$this->url = '//'.$_SERVER['HTTP_HOST'].'/wp-content/plugins/unsplash-media';
+		$this->version = '1.0.2';
 
 		$this->api = 'https://api.unsplash.com';
 		$this->application_id = '7fa28f8e758490ca08252023b476bf194658a5cd27c09ebe15af61b7e4db6548';
@@ -48,49 +41,37 @@ class Unsplash_Media {
 		add_action('parse_request', array($this , 'custom_url_paths'));
 		add_action('admin_menu', array($this, 'register_options_page'));
 
-
-		// Notices (add these when you need to show the notice)
-		// add_action( 'admin_notices', array($this, 'admin_success'));
-		// add_action( 'admin_notices', array($this, 'admin_error'));
-
 	}
 
-
-   /**
-    * GET
-    * -------------------------------------
-    * @param $vars $_GET vars
-    * @param query	Search terms.
-    * @param category	Category ID(‘s) to filter search. If multiple, comma-separated. (deprecated)
-    * @param orientation	Filter search results by photo orientation. Valid values are landscape, portrait, and squarish.
-    * @param page	Page number to retrieve. (Optional; default: 1)
-    * @param per_page	Number of items per page. (Optional; default: 10)
-    * @return JSON
-    * -------------------------------------
-    **/
+   	/**
+   	 * Get Photos
+   	 * @param string $path 
+   	 * @param array $vars 
+   	 * @return JSON
+   	 */
 
 	public function get($path, $vars){
 
 		// Set Headers
-
 		$args = array();
 		$args['headers'] = array( 'Authorization' => 'Client-ID ' . $this->application_id);
-
+		$args['timeout'] = 10;
+		
 		// Set API Path
-
 		$url = $this->api . $path;
 
 		// Build Querystring
-
 		$qs = array();
 		foreach($vars as $key=>$value) $qs[] = $key.'='.$value;
-
 		if(!empty($qs)) $querystring = implode('&', $qs);
 		if(!empty($querystring)) $url .= '?' .$querystring;
 
-		// Make Request
 
+		// Make Request
 		$response = wp_remote_get($url, $args);
+		if(is_wp_error($response)) $this->output_json(array('error'=>"Let's try that again."));
+		
+		// Output Result
 		header('Content-type: application/json');
 		echo $response['body'];
 		die;
@@ -111,11 +92,16 @@ class Unsplash_Media {
 
 		if(!empty($vars['photo'])){
 
+			// Include Importer
 			require_once(ABSPATH . 'wp-admin/includes/media.php');
 			require_once(ABSPATH . 'wp-admin/includes/file.php');
 			require_once(ABSPATH . 'wp-admin/includes/image.php');
 
+			// Set Size
+			$vars['photo'] .= '&w=1800';
+
 			$filename = basename($vars['photo']).'.jpg';
+			$filetype = wp_check_filetype( basename( $filename ), null );
 
 
 			// Save As
@@ -124,12 +110,16 @@ class Unsplash_Media {
 
 			$wp_upload_dir = wp_upload_dir();
 
-			file_put_contents($wp_upload_dir['path'].'/'.$filename, $data); // This works...
+			// Save File to Uploads Folder
+			file_put_contents($wp_upload_dir['path'].'/'.$vars['title'].'.jpg', $data);
 
-			$image = media_sideload_image($wp_upload_dir['url'] . '/' . basename( $filename ),1,$vars['credit']);
-			if($image){
+			// Sideload Image
+			$result = media_sideload_image($wp_upload_dir['url'] . '/' . $vars['title'].'.jpg',1,$vars['credit']);
+			
+			if($result)
 				$this->output_json(array('success'=>'imported'));
-			}
+			else
+				$this->output_json(array('error'=>'Error importing'));
 
 		}
 
@@ -148,7 +138,7 @@ class Unsplash_Media {
 
 	public function scripts() {
 
-		wp_enqueue_script('unsplash', $this->dir . '/assets/unsplash.js', array('jquery'), $this->version, true);
+		wp_enqueue_script('unsplash', $this->url . '/assets/unsplash.js', array('jquery'), $this->version, true);
 
 	}
 
@@ -173,11 +163,6 @@ class Unsplash_Media {
 			case 'api/unsplash/import':
 				$this->import($_POST);
 				break;
-
-			// case 'api/unsplash/mask.jpg':
-			// 	$this->mask($_POST);
-			// 	break;
-
 
 			default:
 				break;
@@ -363,6 +348,7 @@ class Unsplash_Media {
  */
 
 $unsplash_media = new Unsplash_Media();
+
 
 // function custom_media_upload_tab_name( $tabs ) {
 //     $newtab = array( 'tab_slug' => 'Your Tab Name' );

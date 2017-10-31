@@ -7,7 +7,7 @@
 <div class="wrap unsplash-media-library">
 
     <h2><?php _e('Unsplash Media'); ?></h2>
-    <p class="lead">Free stock photos for use in your website. Select photos below to import them to your media library.</p>
+    <h3 class="lead">Free stock photos for use in your website. Select photos below to import them to your media library.</h3>
 
 	<div>
 
@@ -17,8 +17,6 @@
 			<div id="post-body-content">
 
 				<div class="meta-box">
-
-
 
 					<hr>
 
@@ -48,13 +46,11 @@
 
 					<div class="content">
 
-						<h3 class="unplash-message">Loading...</h3>
+						<h3 class="unplash-message">Start by searching.</h3>
 
-						<ul tabindex="-1" class="unsplash-photos">
+						<ul tabindex="-1" class="unsplash-photos"></ul>
 
-
-
-						</ul>
+						<a href="#" class="button load-more" style="display:none;">Load More</a>
 
 					</div>
 

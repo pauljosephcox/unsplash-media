@@ -8,7 +8,11 @@ jQuery(document).ready(function($) {
 
 	var Unsplash = {
 
-		count: 32,
+		count: 28,
+
+		page: 1,
+
+		currentRequest: null,
 
 		// ------------------------------------
 		// Initialize
@@ -18,9 +22,12 @@ jQuery(document).ready(function($) {
 
 	    	// Initial Load
 	    	this.get('/api/unsplash/photos/search?per_page='+this.count+'&query=', Unsplash.displayPhotos);
+	    	Unsplash.currentRequest = '/api/unsplash/photos/search?per_page='+this.count+'&query=';
 
 	    	// Setup Search
 	    	$('.unsplash-search').submit(function(){ Unsplash.search(); return false; });
+
+	    	$('.unsplash-media-library .load-more').click(Unsplash.loadMore);
 
 
 	    },
@@ -33,6 +40,7 @@ jQuery(document).ready(function($) {
 
 	    	// Clear Current Photos
 	    	$('.unsplash-photos li').fadeOut().delay(1000).remove();
+	    	$('.unsplash-media-library .load-more').fadeOut();
 
 	    	var value = $('.unsplash-search-text').val();
 
@@ -41,8 +49,25 @@ jQuery(document).ready(function($) {
 
 	    	// Query Unsplash
 	    	this.get('/api/unsplash/photos/search?per_page='+this.count+'&query='+encodeURI(value), Unsplash.displayPhotos);
+	    	Unsplash.currentRequest = '/api/unsplash/photos/search?per_page='+this.count+'&query='+encodeURI(value);
 
 	    	return false;
+
+	    },
+
+	    // ------------------------------------
+	    // Load More
+	    // ------------------------------------
+
+	    loadMore: function(e){
+
+	    	e.preventDefault();
+
+	    	$(this).fadeOut();
+
+	    	Unsplash.page++;
+
+	    	Unsplash.get(Unsplash.currentRequest+'&page='+Unsplash.page, Unsplash.displayPhotos);
 
 	    },
 
@@ -77,6 +102,12 @@ jQuery(document).ready(function($) {
 
 	    	}
 
+	    	if(data.length < Unsplash.count){
+	    		$('.unsplash-media-library .load-more').fadeOut();
+	    	} else {
+	    		$('.unsplash-media-library .load-more').fadeIn();
+	    	}
+
 	    },
 
 	    // ------------------------------------
@@ -103,6 +134,7 @@ jQuery(document).ready(function($) {
 	    	// Set Data:
 	    	$li.data('photo',data.urls.full);
 	    	$li.data('credit',data.user.name);
+	    	$li.data('title',data.id);
 
 
 	    	// Add Events
@@ -129,6 +161,7 @@ jQuery(document).ready(function($) {
 	    	var args = {};
 	    	args.photo = $photo.data('photo');
 	    	args.credit = $photo.data('credit');
+	    	args.title = $photo.data('title');
 	    	args._wpnonce = $('#_wpnonce').val();
 	    	args._wp_http_referer = $('#_wp_http_referer').val();
 	    	args.unsplash_media_actions = 'import';
